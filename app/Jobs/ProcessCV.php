@@ -273,33 +273,37 @@ class ProcessCV implements ShouldQueue
     }
     
     protected function saveToGoogleSheets($extractedData)
-    {
-        try {
-            $sheetsService = new \App\Services\GoogleSheetsService();
-            
-            // prepare the data to add to Google Sheets
-            $values = [
-                [
-                    $this->jobApplication->name,
-                    $this->jobApplication->email,
-                    $this->jobApplication->phone,
-                    $this->jobApplication->cv_public_link,
-                    json_encode($extractedData['education']),
-                    json_encode($extractedData['qualifications']),
-                    json_encode($extractedData['projects']),
-                    $this->jobApplication->processed_timestamp
-                ]
-            ];
-            
-            // add the data to Google Sheet
-            $sheetsService->append('A1:H1', $values);
-            
-            \Log::info('Data successfully saved to Google Sheets');
-        } catch (\Exception $e) {
-            \Log::error('Error saving to Google Sheets: ' . $e->getMessage());
-        }
+{
+    try {
+        // Prepare the data array
+        $values = [
+            $this->jobApplication->name,
+            $this->jobApplication->email,
+            $this->jobApplication->phone,
+            $this->jobApplication->cv_public_link,
+            json_encode($extractedData['education']),
+            json_encode($extractedData['qualifications']),
+            json_encode($extractedData['projects']),
+            $this->jobApplication->processed_timestamp
+        ];
+        
+        // Dispatch the job with all necessary credentials
+        \App\Jobs\ProcessSheetJob::dispatch(
+            $values,
+            env('GOOGLE_SHEET_ID'),
+            env('GOOGLE_PRIVATE_KEY'),
+            env('GOOGLE_PROJECT_ID'),
+            env('GOOGLE_CLIENT_EMAIL'),
+            env('GOOGLE_PRIVATE_KEY_ID'),
+            env('GOOGLE_CLIENT_ID'),
+            env('GOOGLE_CLIENT_X509_CERT_URL')
+        );
+        
+        \Log::info('Google Sheets job dispatched successfully');
+    } catch (\Exception $e) {
+        \Log::error('Error dispatching Google Sheets job: ' . $e->getMessage());
     }
-    
+}
     protected function sendWebhookNotification()
     {
         // data payload
