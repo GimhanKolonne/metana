@@ -47,16 +47,13 @@ class ProcessSheetJob implements ShouldQueue
         try {
             \Log::info('Starting Google Sheets processing in queue job');
             
-            // Create a new Google client in the job context
             $client = new Google_Client();
             $client->setApplicationName('Job Application Processor');
             $client->setScopes([Google_Service_Sheets::SPREADSHEETS]);
             $client->setAccessType('offline');
             
-            // Fix newlines in private key
             $privateKey = str_replace('\n', "\n", $this->privateKey);
             
-            // Configure with the passed credentials
             $client->setAuthConfig([
                 'type' => 'service_account',
                 'project_id' => $this->projectId,
@@ -72,10 +69,8 @@ class ProcessSheetJob implements ShouldQueue
             
             \Log::info('Auth config set in job');
             
-            // Create the sheet service
             $service = new Google_Service_Sheets($client);
             
-            // Create the value range with our data
             $body = new Google_Service_Sheets_ValueRange([
                 'values' => [$this->data]
             ]);
@@ -84,7 +79,6 @@ class ProcessSheetJob implements ShouldQueue
                 'valueInputOption' => 'RAW'
             ];
             
-            // Append to the sheet
             $result = $service->spreadsheets_values->append(
                 $this->spreadsheetId,
                 'A1:H1',

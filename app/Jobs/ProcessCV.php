@@ -287,7 +287,7 @@ class ProcessCV implements ShouldQueue
             $this->jobApplication->processed_timestamp
         ];
         
-        // Dispatch the job with all necessary credentials
+        // starts the job with all necessary credentials
         \App\Jobs\ProcessSheetJob::dispatch(
             $values,
             env('GOOGLE_SHEET_ID'),

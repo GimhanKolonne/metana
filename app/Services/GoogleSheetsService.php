@@ -23,7 +23,6 @@ class GoogleSheetsService
             
             \Log::info('Project ID: ' . env('GOOGLE_PROJECT_ID'));
             \Log::info('Client Email: ' . env('GOOGLE_CLIENT_EMAIL'));
-            // Don't log sensitive info like private keys
             
             $privateKey = str_replace('\n', "\n", env('GOOGLE_PRIVATE_KEY'));
             
