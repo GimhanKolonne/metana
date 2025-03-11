@@ -17,7 +17,7 @@ class GoogleSheetsService
         $this->client = new Google_Client();
         $this->client->setApplicationName('Job Application Processor');
         $this->client->setScopes([Google_Service_Sheets::SPREADSHEETS]);
-        $this->client->setAuthConfig(storage_path('app/google-credentials.json'));
+        $this->client->setAuthConfig(storage_path('/app/google-credentials.json'));
         $this->client->setAccessType('offline');
         
         $this->service = new Google_Service_Sheets($this->client);
