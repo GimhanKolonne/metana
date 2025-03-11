@@ -79,8 +79,6 @@ class ProcessCV implements ShouldQueue
         // save it to google sheets
         $this->saveToGoogleSheets($extractedData);
 
-        //  send webhook notification
-        $this->sendWebhookNotification();
         
         // queue the emailk to be sent the next day
         SendFollowUpEmail::dispatch($this->jobApplication)
@@ -304,50 +302,5 @@ class ProcessCV implements ShouldQueue
         \Log::error('Error dispatching Google Sheets job: ' . $e->getMessage());
     }
 }
-    protected function sendWebhookNotification()
-    {
-        // data payload
-        $payload = [
-            'cv_data' => [
-                'personal_info' => $this->jobApplication->personal_info,
-                'education' => $this->jobApplication->education,
-                'qualifications' => $this->jobApplication->qualifications,
-                'projects' => $this->jobApplication->projects,
-                'cv_public_link' => $this->jobApplication->cv_public_link
-            ],
-            'metadata' => [
-                'applicant_name' => $this->jobApplication->name,
-                'email' => $this->jobApplication->email,
-                'status' => $this->jobApplication->status, 
-                'cv_processed' => $this->jobApplication->cv_processed,
-                'processed_timestamp' => $this->jobApplication->processed_timestamp->toIso8601String()
-            ]
-        ];
-
-        \Log::info('Webhook Payload:', $payload);
-
-        try {
-            // send the http request
-            $response = Http::withHeaders([
-                'X-Candidate-Email' => env('CANDIDATE_EMAIL', 'email@example.com') 
-            ])->post('https://rnd-assignment.automations-3d6.workers.dev/', $payload);
-
-            \Log::info('Webhook response:', [
-                'status' => $response->status(),
-                'body' => $response->body()
-            ]);
-
-            // checking for successful status code
-            if ($response->successful()) {
-                \Log::info('Webhook notification sent successfully');
-            } else {
-                \Log::error('Failed to send webhook notification', [
-                    'status' => $response->status(),
-                    'error' => $response->body()
-                ]);
-            }
-        } catch (\Exception $e) {
-            \Log::error('Error sending webhook notification: ' . $e->getMessage());
-        }
-    }
+       
 }
