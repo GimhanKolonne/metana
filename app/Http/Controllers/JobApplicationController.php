@@ -24,7 +24,7 @@ class JobApplicationController extends Controller
         'is_production' => 'boolean',
     ]);
 
-    // Upload the cv to s3 storage
+    // to upload the cv to s3 storage
     $path = $request->file('cv')->store('cvs', 's3');
     
 

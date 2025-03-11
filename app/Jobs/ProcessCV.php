@@ -40,12 +40,10 @@ class ProcessCV implements ShouldQueue
         $cvText = '';
         
         if ($fileExtension === 'pdf') {
-            // Parse PDF
             $parser = new Parser();
             $pdf = $parser->parseFile($tempPath);
             $cvText = $pdf->getText();
         } elseif ($fileExtension === 'docx') {
-            // Parse DOCX
             $phpWord = IOFactory::load($tempPath);
             $text = [];
             
@@ -117,8 +115,7 @@ class ProcessCV implements ShouldQueue
             'name' => $this->jobApplication->name,
             'email' => $this->jobApplication->email,
             'phone' => $this->jobApplication->phone,
-            'linkedin' => '',
-            'address' => ''
+            
         ];
         
         // to extract name
@@ -273,7 +270,6 @@ class ProcessCV implements ShouldQueue
     protected function saveToGoogleSheets($extractedData)
 {
     try {
-        // Prepare the data array
         $values = [
             $this->jobApplication->name,
             $this->jobApplication->email,
